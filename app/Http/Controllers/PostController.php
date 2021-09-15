@@ -13,18 +13,22 @@ class PostController extends Controller
         $this->middleware('auth:sanctum')->only('store');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $posts=Post::with('user')->latest()->get();
+        $posts = Post::with('user')
+                     ->take(5)
+                     ->skip($request->get('skip', 0) + (($request->get('page') - 1) * 5))
+                     ->latest()
+                     ->get();
         return PostResource::collection($posts);
     }
 
     public function store(Request $request)
     {
-       $this->validate($request, [
+        $this->validate($request, [
             'body' => ['required']
         ]);
-        $post=$request->user()->posts()->create($request->only('body'));
+        $post = $request->user()->posts()->create($request->only('body'));
         return new PostResource($post);
     }
 }

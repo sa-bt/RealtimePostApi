@@ -51,4 +51,9 @@ class User extends Authenticatable
     {
         return 'http://www.sa-bt.ir/images/pic.png';
     }
+
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
 }
