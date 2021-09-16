@@ -19,3 +19,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 Route::get('/posts',[\App\Http\Controllers\PostController::class,'index']);
 Route::post('/posts',[\App\Http\Controllers\PostController::class,'store']);
+Route::post('/posts/{post}/likes',[\App\Http\Controllers\LikeController::class,'store']);

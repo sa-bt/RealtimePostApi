@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PostCreated;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
 use Illuminate\Http\Request;
@@ -20,7 +21,11 @@ class PostController extends Controller
                      ->skip($request->get('skip', 0) + (($request->get('page') - 1) * 5))
                      ->latest()
                      ->get();
-        return PostResource::collection($posts);
+        return PostResource::collection($posts)->additional([
+            'likes'=>$posts->mapWithKeys(function ($post){
+                return [$post->id=>$post->likes->count()];
+            })
+                                                            ]);
     }
 
     public function store(Request $request)
@@ -29,6 +34,8 @@ class PostController extends Controller
             'body' => ['required']
         ]);
         $post = $request->user()->posts()->create($request->only('body'));
+
+        broadcast(new PostCreated($post));
         return new PostResource($post);
     }
 }
