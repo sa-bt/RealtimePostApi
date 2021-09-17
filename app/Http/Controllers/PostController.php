@@ -22,9 +22,10 @@ class PostController extends Controller
                      ->latest()
                      ->get();
         return PostResource::collection($posts)->additional([
-            'likes'=>$posts->mapWithKeys(function ($post){
-                return [$post->id=>$post->likes->count()];
-            })
+                                                                'likes' => $posts->mapWithKeys(function ($post)
+                                                                {
+                                                                    return [$post->id => $post->likes->count()];
+                                                                })
                                                             ]);
     }
 
@@ -35,7 +36,20 @@ class PostController extends Controller
         ]);
         $post = $request->user()->posts()->create($request->only('body'));
 
-        broadcast(new PostCreated($post));
-        return new PostResource($post);
+        broadcast(new PostCreated($post))->toOthers();
+        return (new PostResource($post))->additional([
+                                                         'likes' => [
+                                                             $post->id => $post->likes->count()
+                                                         ]
+                                                     ]);;
+    }
+
+    public function show(Post $post)
+    {
+        return (new PostResource($post))->additional([
+                                                         'likes' => [
+                                                             $post->id => $post->likes->count()
+                                                         ]
+                                                     ]);
     }
 }
