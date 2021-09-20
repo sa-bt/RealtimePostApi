@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,3 +24,5 @@ Route::get('/posts',[PostController::class,'index']);
 Route::post('/posts',[PostController::class,'store']);
 Route::post('/posts/{post}/likes',[LikeController::class,'store']);
 Route::get('posts/{post}',[PostController::class,'show']);
+
+Route::get('/tasks',[TaskController::class,'index']);
