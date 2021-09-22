@@ -41,7 +41,7 @@ class PostController extends Controller
                                                          'likes' => [
                                                              $post->id => $post->likes->count()
                                                          ]
-                                                     ]);;
+                                                     ]);
     }
 
     public function show(Post $post)

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PostResource;
 use App\Models\Task;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class TaskController extends Controller
 {
@@ -16,7 +18,16 @@ class TaskController extends Controller
 
     public function store(Request $request)
     {
-        //
+
+        $this->validate($request, [
+            'title'       => ['required'],
+            'description' => ['required'],
+        ]);
+
+        $task = $request->user()->tasks()->create($request->all());
+
+        return response()->json($task,Response::HTTP_CREATED);
+
     }
 
 
@@ -35,5 +46,21 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         //
+    }
+
+    public function search(Request $request)
+    {
+        $word  = $request->word;
+        $tasks = Task::query()->where('title', 'LIKE', '%' . $word . '%')->get();
+        return response()->json($tasks);
+    }
+
+    public function done(Task $task)
+    {
+        $task->update([
+            'completed'=>!$task->completed
+                      ]);
+        $task->refresh();
+        return response()->json($task,Response::HTTP_OK);
     }
 }

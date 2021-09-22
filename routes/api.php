@@ -25,4 +25,6 @@ Route::post('/posts',[PostController::class,'store']);
 Route::post('/posts/{post}/likes',[LikeController::class,'store']);
 Route::get('posts/{post}',[PostController::class,'show']);
 
-Route::get('/tasks',[TaskController::class,'index']);
+Route::get('/tasks/search',[TaskController::class,'search']);
+Route::resource('/tasks',TaskController::class);
+Route::post('/tasks/{task}/done',[TaskController::class,'done']);

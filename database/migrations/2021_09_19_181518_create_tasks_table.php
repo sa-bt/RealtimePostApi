@@ -21,6 +21,7 @@ class CreateTasksTable extends Migration
                 ->onDelete('cascade');
 
             $table->string('title');
+            $table->mediumText('description');
             $table->boolean('completed')->default(false);
             $table->timestamps();
         });
