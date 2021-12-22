@@ -2,80 +2,69 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProductRequest;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use App\Repositories\ProductRepository;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class ProductController extends Controller
 {
+    public $repository;
+
+    public function __construct(ProductRepository $productRepository)
+    {
+        $this->repository = $productRepository;
+    }
 
     public function index()
     {
-        return Product::all();
+        #get all products from product repository
+        $products = $this->repository->all();
+       return $this->successResponse(ProductResource::collection($products), 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+
+    public function store(ProductRequest $request)
     {
-        //
+        try {
+            #create new product
+            $product = $this->repository->create($request);
+            return $this->successResponse(new ProductResource($product), Response::HTTP_OK);
+        } catch (\Exception $exception) {
+            return $this->errorResponse(Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
     public function show(Product $product)
     {
-        //
+
+        return $this->successResponse(new ProductResource($product), Response::HTTP_OK);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Product $product)
+
+    public function update(ProductRequest $request, Product $product)
     {
-        //
+        try {
+            #Update Product
+            $this->repository->edit($product, $request);
+            return $this->successResponse(new ProductResource($product), Response::HTTP_OK);
+        } catch (\Exception $exception) {
+            return $this->errorResponse(Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Product $product)
-    {
-        //
-    }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Product $product)
     {
-        //
+        try {
+            #Delete Product
+            $this->repository->delete($product);
+            return $this->successResponse('', Response::HTTP_OK);
+        } catch (\Exception $exception) {
+            return $this->errorResponse(Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

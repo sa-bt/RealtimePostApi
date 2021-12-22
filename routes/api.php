@@ -3,6 +3,7 @@
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\FeatureProductController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -29,4 +30,7 @@ Route::get('posts/{post}',[PostController::class,'show']);
 Route::get('/tasks/search',[TaskController::class,'search']);
 Route::resource('/tasks',TaskController::class);
 Route::post('/tasks/{task}/done',[TaskController::class,'done']);
+
+Route::resource('/products/{product}/features',FeatureProductController::class);
 Route::resource('/products',ProductController::class);
+

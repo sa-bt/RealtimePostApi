@@ -2,11 +2,15 @@
 
 namespace App\Exceptions;
 
+use App\Traits\ApiResponse;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
 use Throwable;
+
 
 class Handler extends ExceptionHandler
 {
+    use ApiResponse;
     /**
      * A list of the exception types that are not reported.
      *
@@ -38,4 +42,41 @@ class Handler extends ExceptionHandler
             //
         });
     }
+
+    public function render($request, Throwable $e)
+    {
+        if ($e instanceof ValidationException)
+        {
+            return $this->errorResponse(422, $e->validator->errors()->messages());
+        }
+
+        if ($e instanceof ModelNotFoundException || $e instanceof NotFoundHttpException)
+        {
+            DB::rollBack();
+            return $this->errorResponse(404, $e->getMessage());
+        }
+
+        if ($e instanceof MethodNotAllowedHttpException ||
+            $e instanceof RelationNotFoundException ||
+            $e instanceof QueryException ||
+            $e instanceof Exception ||
+            $e instanceof Error)
+        {
+            DB::rollBack();
+            return $this->errorResponse(500, $e->getMessage());
+        }
+
+
+        if (config('app.debug'))
+        {
+            DB::rollBack();
+            return parent::render($request, $e);
+        }
+
+        DB::rollBack();
+        return $this->errorResponse(500, $e->getMessage());
+    }
+
+
+
 }
